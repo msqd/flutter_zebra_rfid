@@ -209,4 +209,8 @@ class Reader extends Object {
   void _eventBatteryNotify(String cause, int powerLevel, bool isCharging) {
     print("_eventBatteryNotify: ${this.name} => cause=$cause, powerLevel=$powerLevel , isCharging=$isCharging");
   }
+
+  String toString() {
+    return "Reader(${id}, ${name})";
+  }
 }
