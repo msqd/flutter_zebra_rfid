@@ -4,6 +4,7 @@ library flutter_zebra_rfid;
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:developer';
 
 export 'tagData.dart';
 export 'eventStatus.dart';
@@ -152,7 +153,7 @@ class FlutterZebraRfid {
   Reader _getAvailableReaderInfo(Map readerInfo) {
     final String id = readerInfo["id"];
     Reader reader = _readers.firstWhere((element) => element.id == id, orElse: () {
-      final r =Reader(id: id, name: readerInfo["name"]);
+      final r = Reader(id: id, name: readerInfo["name"]);
       _readers.add(r);
       return r;
     });
@@ -165,6 +166,10 @@ class FlutterZebraRfid {
     return version;
   }
 
+  /**
+   * Retrieve available readers, including paired but not connected.
+   * Connected readers will be marked as active (_isActive).
+   */
   Future<List<Reader>> fetchAvailableReaders() async {
     List<dynamic>? result = await _channel.invokeMethod('getActiveReaders');
     final activeReaderIds = result?.map<String>((e) => e["id"] as String).toList() ?? [];
@@ -179,6 +184,9 @@ class FlutterZebraRfid {
     for (var reader in _readers) {
       reader._isActive = activeReaderIds.contains(reader.id);
     }
+
+    log("Readers ${_readers} (active: ${activeReaderIds})");
+
     return _readers;
   }
 
